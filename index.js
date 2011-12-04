@@ -1,2 +1,3 @@
 
-module.exports = require('./lib/rateLimiter');
+exports.RateLimiter = require('./lib/rateLimiter');
+exports.TokenBucket = require('./lib/tokenBucket');
