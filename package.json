@@ -7,7 +7,7 @@
   "devDependencies": { },
   "keywords": ["rate", "limiting", "throttling"],
   "repository": "git://github.com/jhurliman/node-rate-limiter",
-  "bugs": { "web": "http://github.com/jhurliman/node-rate-limiter/issues" },
+  "bugs": { "url": "http://github.com/jhurliman/node-rate-limiter/issues" },
   "directories": { "lib": "./lib/" },
   "main": "./index.js",
   "licenses": [{
