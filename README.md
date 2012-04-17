@@ -1,5 +1,5 @@
 
-# rate-limiter #
+# limiter #
 
 Provides a generic rate limiter for node.js. Useful for API clients, web 
 crawling, or other tasks that need to be throttled. Two classes are exposed, 
@@ -13,13 +13,13 @@ restrictions like "150 requests per hour maximum".
 
 Use NPM to install:
 
-    npm install rate-limiter
+    npm install limiter
 
 ## Usage ##
 
 A simple example allowing 150 requests per hour:
 
-    var RateLimiter = require('rate-limiter).RateLimiter;
+    var RateLimiter = require('limiter').RateLimiter;
     // Allow 150 requests per hour (the Twitter search limit). Also understands
     // 'second', 'minute', 'day', or a number of milliseconds
     var limiter = new RateLimiter(150, 'hour');
@@ -37,7 +37,7 @@ A simple example allowing 150 requests per hour:
 
 Another example allowing one message to be sent every 250ms:
 
-    var RateLimiter = require('rate-limiter).RateLimiter;
+    var RateLimiter = require('limiter').RateLimiter;
     var limiter = new RateLimiter(1, 250);
     
     limiter.removeTokens(1, function() {
@@ -48,7 +48,7 @@ Uses the token bucket directly to throttle at the byte level:
 
     var BURST_RATE = 1024 * 1024 * 150; // 150KB/sec burst rate
     var FILL_RATE = 1024 * 1024 * 50; // 50KB/sec sustained rate
-    var TokenBucket = require('rate-limiter').TokenBucket;
+    var TokenBucket = require('limiter').TokenBucket;
     // We could also pass a parent token bucket in as the last parameter to
     // create a hierarchical token bucket
     var bucket = new TokenBucket(BURST_RATE, FILL_RATE, 'second', null);
