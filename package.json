@@ -4,7 +4,10 @@
   "version": "0.0.2",
   "author": "John Hurliman <jhurliman@cull.tv>",
   "dependencies": { },
-  "devDependencies": { },
+  "devDependencies": {
+    "assert": "0.4.9",
+    "vows": "0.6.3"
+  },
   "keywords": ["rate", "limiting", "throttling"],
   "repository": "git://github.com/jhurliman/node-rate-limiter",
   "bugs": { "url": "http://github.com/jhurliman/node-rate-limiter/issues" },
