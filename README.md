@@ -19,43 +19,69 @@ Use NPM to install:
 
 A simple example allowing 150 requests per hour:
 
-    var RateLimiter = require('limiter').RateLimiter;
-    // Allow 150 requests per hour (the Twitter search limit). Also understands
-    // 'second', 'minute', 'day', or a number of milliseconds
-    var limiter = new RateLimiter(150, 'hour');
-    
-    // Throttle requests
-    limiter.removeTokens(1, function(err, remainingRequests) {
-      // err will only be set if we request more than the maximum number of
-      // requests we set in the constructor
-      
-      // remainingRequests tells us how many additional requests could be sent
-      // right this moment
-      
-      callMyRequestSendingFunction(...);
-    });
+```javascript
+var RateLimiter = require('limiter').RateLimiter;
+// Allow 150 requests per hour (the Twitter search limit). Also understands
+// 'second', 'minute', 'day', or a number of milliseconds
+var limiter = new RateLimiter(150, 'hour');
+
+// Throttle requests
+limiter.removeTokens(1, function(err, remainingRequests) {
+  // err will only be set if we request more than the maximum number of
+  // requests we set in the constructor
+  
+  // remainingRequests tells us how many additional requests could be sent
+  // right this moment
+  
+  callMyRequestSendingFunction(...);
+});
+```
 
 Another example allowing one message to be sent every 250ms:
 
-    var RateLimiter = require('limiter').RateLimiter;
-    var limiter = new RateLimiter(1, 250);
-    
-    limiter.removeTokens(1, function() {
-      callMyMessageSendingFunction(...);
-    });
+```javascript
+var RateLimiter = require('limiter').RateLimiter;
+var limiter = new RateLimiter(1, 250);
+
+limiter.removeTokens(1, function() {
+  callMyMessageSendingFunction(...);
+});
+```
+
+The default behaviour is to wait for the duration of the rate limiting
+that’s currently in effect before the callback is fired, but if you 
+pass in ```true``` as the third parameter, the callback will be fired 
+immediately with remainingRequests set to -1:
+
+```javascript
+var RateLimiter = require('limiter').RateLimiter;
+var limiter = new RateLimiter(150, 'hour', true);  // fire CB immediately
+
+// Immediately send 429 header to client when rate limiting is in effect
+limiter.removeTokens(1, function(err, remainingRequests) {
+  if (remainingRequests < 0) {
+    response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
+    response.end('429 Too Many Requests - your IP is being rate limited');
+  } else {
+    callMyMessageSendingFunction(...);
+  }
+});
+```
 
 Uses the token bucket directly to throttle at the byte level:
 
-    var BURST_RATE = 1024 * 1024 * 150; // 150KB/sec burst rate
-    var FILL_RATE = 1024 * 1024 * 50; // 50KB/sec sustained rate
-    var TokenBucket = require('limiter').TokenBucket;
-    // We could also pass a parent token bucket in as the last parameter to
-    // create a hierarchical token bucket
-    var bucket = new TokenBucket(BURST_RATE, FILL_RATE, 'second', null);
-    
-    bucket.removeTokens(myData.byteLength, function() {
-      sendMyData(myData);
-    });
+```javascript
+var BURST_RATE = 1024 * 1024 * 150; // 150KB/sec burst rate
+var FILL_RATE = 1024 * 1024 * 50; // 50KB/sec sustained rate
+var TokenBucket = require('limiter').TokenBucket;
+// We could also pass a parent token bucket in as the last parameter to
+// create a hierarchical token bucket
+var bucket = new TokenBucket(BURST_RATE, FILL_RATE, 'second', null);
+
+bucket.removeTokens(myData.byteLength, function() {
+  sendMyData(myData);
+});
+```
 
 ## Additional Notes ##
 
