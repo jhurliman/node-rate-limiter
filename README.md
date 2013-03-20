@@ -68,6 +68,16 @@ limiter.removeTokens(1, function(err, remainingRequests) {
 });
 ```
 
+To get the number of remaining tokens **outside** the `removeTokens`-callback
+simply use the `getTokensRemaining`-method.
+```javascript
+var RateLimiter = require('limiter').RateLimiter;
+var limiter = new RateLimiter(1, 250);
+
+// returns 1 since we did not remove a token and our number of tokens per interval is 1
+limiter.getTokensRemaining();
+```
+
 Uses the token bucket directly to throttle at the byte level:
 
 ```javascript
