@@ -68,6 +68,17 @@ limiter.removeTokens(1, function(err, remainingRequests) {
 });
 ```
 
+A synchronous method, tryRemoveTokens(), is available in both RateLimiter and TokenBucket. This will return immediately with a boolean value indicating if the token removal was successful.
+```javascript
+var RateLimiter = require('limiter').RateLimiter;
+var limiter = new RateLimiter(10, 'second');
+
+if (limiter.tryRemoveTokens(5))
+  console.log('Tokens removed');
+else
+  console.log('No tokens removed');
+```
+
 To get the number of remaining tokens **outside** the `removeTokens`-callback
 simply use the `getTokensRemaining`-method.
 ```javascript
@@ -78,7 +89,7 @@ var limiter = new RateLimiter(1, 250);
 limiter.getTokensRemaining();
 ```
 
-Uses the token bucket directly to throttle at the byte level:
+Using the token bucket directly to throttle at the byte level:
 
 ```javascript
 var BURST_RATE = 1024 * 1024 * 150; // 150KB/sec burst rate
@@ -101,15 +112,11 @@ Otherwise, earlier messages may get held up for long periods of time if more
 recent messages are continually draining the token bucket. This can lead to 
 out of order messages or the appearance of "lost" messages under heavy load.
 
-## Sponsors ##
-
-* [cull.tv](http://cull.tv/) - New music television
-
 ## License ##
 
 (The MIT License)
 
-Copyright (c) 2011 Cull TV, Inc. &lt;jhurliman@cull.tv&gt;
+Copyright (c) 2013 John Hurliman. &lt;jhurliman@jhurliman.org&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
