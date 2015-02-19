@@ -15,5 +15,8 @@
     "limiting",
     "throttling"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "ignore": [
+    "package.json"
+  ]
 }
