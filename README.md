@@ -89,6 +89,20 @@ var limiter = new RateLimiter(1, 250);
 limiter.getTokensRemaining();
 ```
 
+If you want to clear the queue of a token bucket (e.g. after the client disconnects), simply use the `clearTimeouts`-method.
+```javascript
+var RateLimiter = require('limiter').RateLimiter;
+var limiter = new RateLimiter(1, 250);
+
+limiter.removeTokens(1, function() {
+  callMyMessageSendingFunction(...);
+});
+
+// now we get an event that the client has disconnected and want to clear
+// the queue to make sure we don't parse throttled requests of a dead client
+limiter.clearTimeouts();
+```
+
 Using the token bucket directly to throttle at the byte level:
 
 ```javascript
