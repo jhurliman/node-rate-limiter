@@ -1,5 +1,6 @@
-
 # limiter #
+
+[![Build Status](https://travis-ci.org/jhurliman/node-rate-limiter.png)](https://travis-ci.org/jhurliman/node-rate-limiter)
 
 Provides a generic rate limiter for node.js. Useful for API clients, web 
 crawling, or other tasks that need to be throttled. Two classes are exposed, 
