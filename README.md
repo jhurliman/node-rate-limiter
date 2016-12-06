@@ -61,7 +61,7 @@ var limiter = new RateLimiter(150, 'hour', true);  // fire CB immediately
 
 // Immediately send 429 header to client when rate limiting is in effect
 limiter.removeTokens(1, function(err, remainingRequests) {
-  if (remainingRequests < 0) {
+  if (remainingRequests < 1) {
     response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
     response.end('429 Too Many Requests - your IP is being rate limited');
   } else {
