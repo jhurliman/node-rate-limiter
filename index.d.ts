@@ -3,8 +3,10 @@ export type Fail<T> = (error: T) => void
 export type Success<T> = (error: null, data: T) => void
 export type RemoveTokensCallback = Fail<TokenBucketError> | Success<number>
 
+type Interval = number | 'second' | 'sec' | 'minute' | 'min' | 'hour' | 'hr' | 'day'
+
 export declare class TokenBucket {
-  constructor(bucketSize: number, tokensPerInterval: number, interval: number, parentBucket?: TokenBucket)
+  constructor(bucketSize: number, tokensPerInterval: number, interval: Interval, parentBucket?: TokenBucket)
 
   removeToken(count: number, callback: RemoveTokensCallback): void
   tryRemoveTokens(count: number): boolean
@@ -12,7 +14,7 @@ export declare class TokenBucket {
 }
 
 export declare class RateLimiter {
-  constructor(tokensPerInterval: number, interval: number, fireImmediately?: boolean)
+  constructor(tokensPerInterval: number, interval: Interval, fireImmediately?: boolean)
 
   removeTokens(count: number, callback: RemoveTokensCallback): void
   tryRemoveTokens(count: number): boolean
