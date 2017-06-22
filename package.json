@@ -17,6 +17,7 @@
   "bugs": { "url": "http://github.com/jhurliman/node-rate-limiter/issues" },
   "directories": { "lib": "./lib/" },
   "main": "./index.js",
+  "types": "./index.d.ts",
   "licenses": [{
     "type": "MIT",
     "url": "http://github.com/jhurliman/node-rate-limiter/raw/master/LICENSE.txt"
