@@ -6,20 +6,29 @@
   "scripts": {
     "test": "vows --spec"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "assert": "1.3.0",
     "vows": "0.8.1"
   },
-  "keywords": ["rate", "limiting", "throttling"],
+  "keywords": [
+    "rate",
+    "limiting",
+    "throttling"
+  ],
   "repository": "git://github.com/jhurliman/node-rate-limiter",
-  "bugs": { "url": "http://github.com/jhurliman/node-rate-limiter/issues" },
-  "directories": { "lib": "./lib/" },
+  "bugs": {
+    "url": "http://github.com/jhurliman/node-rate-limiter/issues"
+  },
+  "directories": {
+    "lib": "./lib/"
+  },
   "main": "./index.js",
   "types": "./index.d.ts",
-  "licenses": [{
-    "type": "MIT",
-    "url": "http://github.com/jhurliman/node-rate-limiter/raw/master/LICENSE.txt"
-  }]
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/jhurliman/node-rate-limiter/raw/master/LICENSE.txt"
+    }
+  ]
 }
