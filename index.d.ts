@@ -1,6 +1,6 @@
 export type TokenBucketError = string
 export type Fail<T> = (error: T) => void
-export type Success<T> = (error: null, data: T, scheduled: number) => void
+export type Success<T> = (error: null, data: T, scheduledTokens: number) => void
 export type RemoveTokensCallback = Fail<TokenBucketError> | Success<number>
 
 type Interval = number | 'second' | 'sec' | 'minute' | 'min' | 'hour' | 'hr' | 'day'
