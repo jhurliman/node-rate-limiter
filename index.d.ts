@@ -18,4 +18,5 @@ export declare class RateLimiter {
 
   removeTokens(count: number, callback: RemoveTokensCallback): void
   tryRemoveTokens(count: number): boolean
+  getTokensRemaining(): number
 }
