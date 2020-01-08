@@ -1,7 +1,7 @@
 {
   "name": "limiter",
   "description": "A generic rate limiter for node.js. Useful for API clients, web crawling, or other tasks that need to be throttled",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "author": "John Hurliman <jhurliman@jhurliman.org>",
   "scripts": {
     "test": "vows --spec"
