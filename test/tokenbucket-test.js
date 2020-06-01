@@ -64,7 +64,7 @@ vows.describe('TokenBucket').addBatch({
       }
     }
   },
-  'startsFull true': {
+  'startFull true': {
     topic: new TokenBucket(10, 1, 100, undefined, true),
     'is initialized full': function(bucket) {
       assert.equal(bucket.bucketSize, 10);

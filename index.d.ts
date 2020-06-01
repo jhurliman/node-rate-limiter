@@ -6,7 +6,10 @@ export type RemoveTokensCallback = Fail<TokenBucketError> | Success<number>
 type Interval = number | 'second' | 'sec' | 'minute' | 'min' | 'hour' | 'hr' | 'day'
 
 export declare class TokenBucket {
-  constructor(bucketSize: number, tokensPerInterval: number, interval: Interval, parentBucket?: TokenBucket)
+  constructor(
+    bucketSize: number, tokensPerInterval: number, interval: Interval,
+    parentBucket?: TokenBucket, startFull?: boolean,
+  )
 
   removeTokens(count: number, callback: RemoveTokensCallback): void
   tryRemoveTokens(count: number): boolean
