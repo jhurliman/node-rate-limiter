@@ -64,4 +64,12 @@ vows.describe('TokenBucket').addBatch({
       }
     }
   },
+  'startsFull true': {
+    topic: new TokenBucket(10, 1, 100, undefined, true),
+    'is initialized full': function(bucket) {
+      assert.equal(bucket.bucketSize, 10);
+      assert.equal(bucket.tokensPerInterval, 1);
+      assert.equal(bucket.content, bucket.bucketSize);
+    }
+  }
 }).export(module);
