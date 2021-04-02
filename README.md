@@ -106,6 +106,10 @@ bucket.removeTokens(myData.byteLength, function() {
 });
 ```
 
+There is some ready-to-run samples under [./samples](./samples). Example:
+
+    node samples/rateLimiter.js
+
 ## Additional Notes ##
 
 Both the token bucket and rate limiter should be used with a message queue or 
