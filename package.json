@@ -22,7 +22,7 @@
   ],
   "scripts": {
     "lint": "eslint --fix src",
-    "prepack": "yarn tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
+    "prepack": "yarn ttsc -p tsconfig.json && ttsc -p tsconfig.cjs.json",
     "test": "jest src"
   },
   "dependencies": {
@@ -36,11 +36,13 @@
     "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
+    "@zoltu/typescript-transformer-append-js-extension": "^1.0.1",
     "babel-jest": "^26.6.3",
     "eslint": "^7.25.0",
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
+    "ttypescript": "^1.5.12",
     "typescript": "^4.2.4"
   },
   "keywords": [

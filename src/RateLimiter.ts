@@ -1,5 +1,5 @@
-import { Interval, TokenBucket } from "./TokenBucket.js";
-import { getMilliseconds, wait } from "./clock.js";
+import { Interval, TokenBucket } from "./TokenBucket";
+import { getMilliseconds, wait } from "./clock";
 
 export type RateLimiterOpts = {
   tokensPerInterval: number;
