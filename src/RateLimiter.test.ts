@@ -1,9 +1,5 @@
-// var vows = require('vows');
-// var assert = require('assert');
-// var RateLimiter = require('../lib/rateLimiter');
-
-import { RateLimiter } from "./RateLimiter";
-import { Interval } from "./TokenBucket";
+import { RateLimiter } from "./RateLimiter.js";
+import { Interval } from "./TokenBucket.js";
 
 describe("RateLimiter", () => {
   describe("interval validation", () => {
