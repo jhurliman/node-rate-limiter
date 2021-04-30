@@ -1,7 +1,7 @@
-const TIMING_EPSILON = 10;
-
 import { TokenBucket } from "./TokenBucket";
 import { wait } from "./clock";
+
+const TIMING_EPSILON = 10;
 
 describe("TokenBucket", () => {
   describe("capacity 10, 1 per 100ms", () => {

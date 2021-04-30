@@ -3,6 +3,12 @@
 {
   "include": ["./src/**/*.ts"],
   "compilerOptions": {
+    "plugins": [
+      {
+        "transform": "@zoltu/typescript-transformer-append-js-extension/output/index.js",
+        "after": true
+      }
+    ],
     "outDir": "./dist/esm",
     "rootDir": "./src",
     "target": "esnext",
