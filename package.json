@@ -1,9 +1,8 @@
 {
   "name": "limiter",
   "description": "A generic rate limiter for the web and node.js. Useful for API clients, web crawling, or other tasks that need to be throttled",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "author": "John Hurliman <jhurliman@jhurliman.org>",
-  "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "browser": "./dist/esm/index.js",
@@ -26,7 +25,7 @@
     "test": "jest src"
   },
   "dependencies": {
-    "just-performance": "4.2.0"
+    "just-performance": "4.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.13.16",
