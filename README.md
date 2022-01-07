@@ -13,7 +13,7 @@ that can be removed each interval to comply with common API restrictions such as
 
 ## Installation
 
-    yarn install limiter
+    yarn add limiter
 
 ## Usage
 
