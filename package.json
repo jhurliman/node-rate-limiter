@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "lint": "eslint --fix src",
-    "prepack": "yarn ttsc -p tsconfig.json && ttsc -p tsconfig.cjs.json",
+    "prepack": "yarn ttsc -p tsconfig.json && echo '{\n\t\"type\": \"module\"\n}' > dist/esm/package.json && ttsc -p tsconfig.cjs.json",
     "test": "jest src"
   },
   "dependencies": {
