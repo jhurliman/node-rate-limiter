@@ -1,5 +1,5 @@
-import { TokenBucket } from "./TokenBucket";
-import { wait } from "./clock";
+import { TokenBucket } from "./TokenBucket.js";
+import { wait } from "./clock.js";
 
 const TIMING_EPSILON = 10;
 

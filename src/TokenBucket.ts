@@ -1,4 +1,4 @@
-import { getMilliseconds, wait } from "./clock";
+import { getMilliseconds, wait } from "./clock.js";
 
 export type Interval = number | "second" | "sec" | "minute" | "min" | "hour" | "hr" | "day";
 

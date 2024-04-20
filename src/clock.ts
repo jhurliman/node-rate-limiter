@@ -1,5 +1,3 @@
-import { performance } from "just-performance";
-
 // generate timestamp or delta
 // see http://nodejs.org/api/process.html#process_process_hrtime
 function hrtime(previousTimestamp?: [number, number]): [number, number] {
