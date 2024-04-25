@@ -1,2 +1,2 @@
-export * from "./RateLimiter";
-export * from "./TokenBucket";
+export * from "./RateLimiter.js";
+export * from "./TokenBucket.js";

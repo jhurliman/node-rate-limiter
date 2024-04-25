@@ -1,5 +1,5 @@
-import { RateLimiter } from "./RateLimiter";
-import { Interval } from "./TokenBucket";
+import { RateLimiter } from "./RateLimiter.js";
+import { Interval } from "./TokenBucket.js";
 
 describe("RateLimiter", () => {
   describe("interval validation", () => {
