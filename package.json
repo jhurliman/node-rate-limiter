@@ -1,7 +1,7 @@
 {
   "name": "limiter",
   "description": "A generic rate limiter for the web and node.js. Useful for API clients, web crawling, or other tasks that need to be throttled",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "author": "John Hurliman <jhurliman@jhurliman.org>",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -48,5 +48,6 @@
     "rate",
     "limiting",
     "throttling"
-  ]
+  ],
+  "packageManager": "yarn@1.22.19+sha512.ff4579ab459bb25aa7c0ff75b62acebe576f6084b36aa842971cf250a5d8c6cd3bc9420b22ce63c7f93a0857bc6ef29291db39c3e7a23aab5adfd5a4dd6c5d71"
 }
