@@ -1,9 +1,0 @@
-language: node_js
-
-node_js:
-  - 16
-  - 10
-
-notifications:
-  email:
-    - "jhurliman@jhurliman.org"

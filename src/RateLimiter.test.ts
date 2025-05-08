@@ -4,7 +4,7 @@ import { Interval } from "./TokenBucket.js";
 describe("RateLimiter", () => {
   describe("interval validation", () => {
     it("invalid interval", () => {
-      const junkInterval = ("junk" as unknown) as Interval;
+      const junkInterval = "junk" as unknown as Interval;
       expect(() => new RateLimiter({ tokensPerInterval: 1, interval: junkInterval })).toThrow();
     });
 

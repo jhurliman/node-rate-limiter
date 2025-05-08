@@ -52,7 +52,7 @@ export class RateLimiter {
     // Make sure the request isn't for more than we can handle
     if (count > this.tokenBucket.bucketSize) {
       throw new Error(
-        `Requested tokens ${count} exceeds maximum tokens per interval ${this.tokenBucket.bucketSize}`
+        `Requested tokens ${count} exceeds maximum tokens per interval ${this.tokenBucket.bucketSize}`,
       );
     }
 
