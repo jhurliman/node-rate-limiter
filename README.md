@@ -1,6 +1,6 @@
 # limiter
 
-[![Build Status](https://travis-ci.org/jhurliman/node-rate-limiter.png)](https://travis-ci.org/jhurliman/node-rate-limiter)
+![Build Status](https://github.com/jhurliman/node-rate-limiter/actions/workflows/ci.yml/badge.svg)
 [![NPM Downloads](https://img.shields.io/npm/dm/limiter.svg?style=flat)](https://www.npmjs.com/package/limiter)
 
 Provides a generic rate limiter for the web and node.js. Useful for API clients,
