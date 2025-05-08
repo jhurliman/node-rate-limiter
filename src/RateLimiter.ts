@@ -5,6 +5,7 @@ export type RateLimiterOpts = {
   tokensPerInterval: number;
   interval: Interval;
   fireImmediately?: boolean;
+  bucketSize?: number;
 };
 
 /**
@@ -18,6 +19,8 @@ export type RateLimiterOpts = {
  *  one of the following strings: 'second', 'minute', 'hour', day'.
  * @param options.fireImmediately Whether or not the promise will resolve
  *  immediately when rate limiting is in effect (default is false).
+ * @param options.bucketSize Maximum number of tokens to hold in the bucket.
+ * Also known as the burst rate. Defaults to options.tokensPerInterval.
  */
 export class RateLimiter {
   tokenBucket: TokenBucket;
@@ -25,9 +28,9 @@ export class RateLimiter {
   tokensThisInterval: number;
   fireImmediately: boolean;
 
-  constructor({ tokensPerInterval, interval, fireImmediately }: RateLimiterOpts) {
+  constructor({ tokensPerInterval, interval, fireImmediately, bucketSize }: RateLimiterOpts) {
     this.tokenBucket = new TokenBucket({
-      bucketSize: tokensPerInterval,
+      bucketSize: bucketSize ?? tokensPerInterval,
       tokensPerInterval,
       interval,
     });
