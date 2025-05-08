@@ -19,7 +19,7 @@ describe("TokenBucket", () => {
 
       const duration = +new Date() - start;
       const diff = Math.abs(1000 - duration);
-      expect(diff < TIMING_EPSILON);
+      expect(diff).toBeLessThan(TIMING_EPSILON);
       expect(remainingTokens).toEqual(0);
       expect(bucket.content).toEqual(0);
     });
@@ -32,7 +32,7 @@ describe("TokenBucket", () => {
       const remainingTokens = await bucket.removeTokens(10);
       const duration = +new Date() - start;
       const diff = Math.abs(1000 - duration);
-      expect(diff < TIMING_EPSILON);
+      expect(diff).toBeLessThan(TIMING_EPSILON);
       expect(remainingTokens).toEqual(0);
       expect(bucket.content).toEqual(0);
     });
@@ -43,7 +43,7 @@ describe("TokenBucket", () => {
       const start = +new Date();
       const remainingTokens = await bucket.removeTokens(10);
       const duration = +new Date() - start;
-      expect(duration < TIMING_EPSILON);
+      expect(duration).toBeLessThan(TIMING_EPSILON);
       expect(remainingTokens).toEqual(0);
     });
 
@@ -54,7 +54,7 @@ describe("TokenBucket", () => {
       const remainingTokens = await bucket.removeTokens(1);
       const duration = +new Date() - start;
       const diff = Math.abs(100 - duration);
-      expect(diff < TIMING_EPSILON);
+      expect(diff).toBeLessThan(TIMING_EPSILON);
       expect(remainingTokens).toBeLessThan(1);
     });
   });
