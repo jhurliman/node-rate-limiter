@@ -15,6 +15,36 @@ that can be removed each interval to comply with common API restrictions such as
 
     yarn add limiter
 
+## Upgrading from 3.x
+
+Version 4 fixes concurrent accounting and waiting behavior. It keeps the existing
+constructors, methods, CommonJS/ESM imports, and fractional-token support, but is
+a major release because these observable behaviors change:
+
+- Token counts and capacities must be finite, non-negative numbers no greater
+  than `Number.MAX_SAFE_INTEGER`. Numeric intervals must be finite and positive.
+  Invalid values now throw `RangeError`, or reject an asynchronous call. Validate
+  configuration and handle rejected `removeTokens()` promises; do not use
+  negative values, `NaN`, or `Infinity` as sentinels.
+- Waiting `removeTokens()` calls on the same instance run in FIFO order. A large
+  request at the front can delay smaller requests behind it. Synchronous calls
+  and `fireImmediately` requests can still consume capacity ahead of the queue;
+  children sharing a parent do not have a global FIFO order.
+- Concurrent requests now respect the interval allowance and charge a hierarchy
+  only once per successful removal. Workloads that previously exceeded their
+  configured limits may wait longer or receive an immediate rejection signal.
+- Remaining balances retain fractional millisecond timing precision. Avoid exact
+  equality checks on fractional balances; use `tryRemoveTokens()` to check
+  whether a request can proceed immediately.
+
+Zero-value conventions are unchanged: a standalone `TokenBucket` with
+`bucketSize: 0` is unlimited and bypasses parents; `tokensPerInterval: 0` refills
+a finite bucket on every attempt. A `RateLimiter` with `tokensPerInterval: 0`
+accepts only zero-token requests. These settings are not a general off switch.
+
+See the [changelog](CHANGELOG.md) for the release history and
+[Additional Notes](#additional-notes) for the full timing and queue semantics.
+
 ## Usage
 
 A simple example allowing 150 requests per hour:
