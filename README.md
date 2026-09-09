@@ -22,15 +22,15 @@ A simple example allowing 150 requests per hour:
 ```javascript
 import { RateLimiter } from "limiter";
 
-// Allow 150 requests per hour (the Twitter search limit). Also understands
+// Allow 150 requests per hour. Also understands
 // 'second', 'minute', 'day', or a number of milliseconds
 const limiter = new RateLimiter({ tokensPerInterval: 150, interval: "hour" });
 
 async function sendRequest() {
   // This call will throw if we request more than the maximum number of requests
   // that were set in the constructor
-  // remainingRequests tells us how many additional requests could be sent
-  // right this moment
+  // remainingRequests is the underlying bucket balance; the interval counter
+  // may impose a lower allowance.
   const remainingRequests = await limiter.removeTokens(1);
   callMyRequestSendingFunction(...);
 }
@@ -108,14 +108,14 @@ Using the token bucket directly to throttle at the byte level:
 ```javascript
 import { TokenBucket } from "limiter";
 
-const BURST_RATE = 1024 * 1024 * 150; // 150KB/sec burst rate
-const FILL_RATE = 1024 * 1024 * 50; // 50KB/sec sustained rate
+const BURST_CAPACITY = 1024 * 150; // 150 KiB maximum burst
+const FILL_RATE = 1024 * 50; // 50 KiB per second sustained rate
 
 // We could also pass a parent token bucket in to create a hierarchical token
 // bucket
 // bucketSize, tokensPerInterval, interval
 const bucket = new TokenBucket({
-  bucketSize: BURST_RATE,
+  bucketSize: BURST_CAPACITY,
   tokensPerInterval: FILL_RATE,
   interval: "second"
 });
@@ -128,11 +128,41 @@ async function handleData(myData) {
 
 ## Additional Notes
 
-Both the token bucket and rate limiter should be used with a message queue or 
-some way of preventing multiple simultaneous calls to removeTokens(). 
-Otherwise, earlier messages may get held up for long periods of time if more 
-recent messages are continually draining the token bucket. This can lead to 
-out of order messages or the appearance of "lost" messages under heavy load.
+Waiting calls to `removeTokens()` are processed in FIFO order on each instance,
+using one active timer per instance. Concurrent calls are supported. A request
+is charged only when it can succeed; hierarchical buckets debit the child and
+all parents together. Independent children sharing a parent do not have a global
+FIFO order. `tryRemoveTokens()` and `fireImmediately` requests do not join the
+waiting queue and may consume capacity ahead of waiting requests.
+
+`RateLimiter` combines a continuously refilled token bucket with an interval
+counter. Its interval starts at construction and resets on the first removal
+attempt at or after the previous interval expires. It is **not** a rolling-window
+limiter: traffic around an interval boundary can exceed the configured count in
+a sliding window. It does not track when your asynchronous work finishes, and it
+does not limit simultaneous in-flight operations. Use a concurrency limiter or
+rolling-window algorithm separately when those are your requirements.
+
+`getTokensRemaining()` reports the underlying bucket's balance (possibly
+fractional), not the interval counter's remaining allowance. Use
+`tryRemoveTokens()` to test whether a request can proceed immediately.
+
+Token counts and capacities must be finite, non-negative numbers at most
+`Number.MAX_SAFE_INTEGER`; fractional tokens are supported. Numeric intervals
+must be finite and greater than zero. Invalid input throws `RangeError` (an
+async call rejects). An oversized request returns `false` from `tryRemoveTokens()`
+and rejects from `removeTokens()`. A standalone `TokenBucket` starts empty;
+`RateLimiter` starts full. For compatibility, `bucketSize: 0` means unlimited
+capacity and bypasses parents, and `tokensPerInterval: 0` refills a finite bucket
+to capacity on every attempt. These zero values do **not** disable all traffic.
+`RateLimiter` with `tokensPerInterval: 0` accepts only zero-token requests.
+
+Timing uses a monotonic clock. Timers can run late when the event loop is busy;
+availability is rechecked after every wait. Balances use JavaScript floating-point
+numbers, so fractional results can have normal rounding error. State is local to
+the instance and is not shared across processes, workers, or machines. Configure
+instances at the scope of the resource you want to limit; creating a new limiter
+for every request defeats a shared rate limit.
 
 ## License
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Reserve interval allowance before asynchronous calls yield; recheck it after waiting.
+- Debit parent and child buckets together, avoiding double charges under contention.
+- Serialize waiting requests per instance with one active timer, and reject cyclic parents.
+- Reject invalid token values and intervals; cap long timers and avoid NaN balances for very short intervals.
+- Correct the byte-throttling example and document interval, queue, zero-value, and floating-point behavior.
+
+### Compatibility
+- Invalid numeric inputs now throw `RangeError` (or reject the returned promise).
+- Async requests on one instance now run FIFO; synchronous requests can still consume capacity first.
+- Fractional millisecond clock precision is retained, so remaining balances may differ slightly from earlier versions.
+
 ## [3.0.0] - 2025-01-24
 ### Added
 - **Dual Module Support:** Distributed as both CommonJS and ES Module, with separate `package.json` files for each format (no need for custom transformers). This improves compatibility with modern bundlers and frameworks.

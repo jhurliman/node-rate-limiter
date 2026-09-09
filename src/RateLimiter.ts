@@ -1,4 +1,5 @@
-import { Interval, TokenBucket } from "./TokenBucket.js";
+import { RequestQueue } from "./RequestQueue.js";
+import { Interval, TokenBucket, validateTokens } from "./TokenBucket.js";
 import { getMilliseconds, wait } from "./clock.js";
 
 export type RateLimiterOpts = {
@@ -20,6 +21,7 @@ export type RateLimiterOpts = {
  *  immediately when rate limiting is in effect (default is false).
  */
 export class RateLimiter {
+  private readonly requests = new RequestQueue();
   tokenBucket: TokenBucket;
   curIntervalStart: number;
   tokensThisInterval: number;
@@ -49,40 +51,25 @@ export class RateLimiter {
    * @returns A promise for the remainingTokens count.
    */
   async removeTokens(count: number): Promise<number> {
-    // Make sure the request isn't for more than we can handle
+    validateTokens(count, "count");
     if (count > this.tokenBucket.bucketSize) {
-      throw new Error(
+      throw new RangeError(
         `Requested tokens ${count} exceeds maximum tokens per interval ${this.tokenBucket.bucketSize}`,
       );
     }
-
-    const now = getMilliseconds();
-
-    // Advance the current interval and reset the current interval token count
-    // if needed
-    if (now < this.curIntervalStart || now - this.curIntervalStart >= this.tokenBucket.interval) {
-      this.curIntervalStart = now;
-      this.tokensThisInterval = 0;
+    if (this.fireImmediately) {
+      return this.tryRemoveTokens(count) ? this.tokenBucket.content : -1;
     }
-
-    // If we don't have enough tokens left in this interval, wait until the
-    // next interval
-    if (count > this.tokenBucket.tokensPerInterval - this.tokensThisInterval) {
-      if (this.fireImmediately) {
-        return -1;
-      } else {
-        const waitMs = Math.ceil(this.curIntervalStart + this.tokenBucket.interval - now);
-        await wait(waitMs);
-        const remainingTokens = await this.tokenBucket.removeTokens(count);
-        this.tokensThisInterval += count;
-        return remainingTokens;
+    return this.requests.run(async () => {
+      while (true) {
+        if (this.tryRemoveTokens(count)) return this.tokenBucket.content;
+        const intervalDelay =
+          count > this.tokenBucket.tokensPerInterval - this.tokensThisInterval
+            ? this.curIntervalStart + this.tokenBucket.interval - getMilliseconds()
+            : 0;
+        await wait(Math.max(1, Math.ceil(intervalDelay), this.tokenBucket.getWaitTime(count)));
       }
-    }
-
-    // Remove the requested number of tokens from the token bucket
-    const remainingTokens = await this.tokenBucket.removeTokens(count);
-    this.tokensThisInterval += count;
-    return remainingTokens;
+    });
   }
 
   /**
@@ -95,6 +82,7 @@ export class RateLimiter {
    *  false.
    */
   tryRemoveTokens(count: number): boolean {
+    validateTokens(count, "count");
     // Make sure the request isn't for more than we can handle
     if (count > this.tokenBucket.bucketSize) return false;
 

@@ -1,3 +1,4 @@
+import { RequestQueue } from "./RequestQueue.js";
 import { getMilliseconds, wait } from "./clock.js";
 
 export type Interval = number | "second" | "sec" | "minute" | "min" | "hour" | "hr" | "day";
@@ -24,6 +25,7 @@ export type TokenBucketOpts = {
  *  the parent of this bucket.
  */
 export class TokenBucket {
+  private readonly requests = new RequestQueue();
   bucketSize: number;
   tokensPerInterval: number;
   interval: number;
@@ -32,6 +34,8 @@ export class TokenBucket {
   lastDrip: number;
 
   constructor({ bucketSize, tokensPerInterval, interval, parentBucket }: TokenBucketOpts) {
+    validateTokens(bucketSize, "bucketSize");
+    validateTokens(tokensPerInterval, "tokensPerInterval");
     this.bucketSize = bucketSize;
     this.tokensPerInterval = tokensPerInterval;
 
@@ -59,6 +63,9 @@ export class TokenBucket {
       this.interval = interval;
     }
 
+    if (!Number.isFinite(this.interval) || this.interval <= 0) {
+      throw new RangeError("interval must be a finite positive number of milliseconds");
+    }
     this.parentBucket = parentBucket;
     this.content = 0;
     this.lastDrip = getMilliseconds();
@@ -72,47 +79,42 @@ export class TokenBucket {
    * @returns A promise for the remainingTokens count.
    */
   async removeTokens(count: number): Promise<number> {
-    // Is this an infinite size bucket?
-    if (this.bucketSize === 0) {
-      return Number.POSITIVE_INFINITY;
+    validateTokens(count, "count");
+    this.getWaitTime(count);
+    return this.requests.run(async () => {
+      while (true) {
+        if (this.tryRemoveTokens(count)) return this.remainingTokens();
+        await wait(Math.max(1, this.getWaitTime(count)));
+      }
+    });
+  }
+
+  /** Return the wait required by this bucket and all of its ancestors. */
+  getWaitTime(count: number): number {
+    validateTokens(count, "count");
+    let delay = 0;
+    for (const bucket of hierarchy(this)) {
+      if (count > bucket.bucketSize) {
+        throw new RangeError(`Requested tokens ${count} exceeds bucket size ${bucket.bucketSize}`);
+      }
+      bucket.drip();
+      if (count > bucket.content) {
+        delay = Math.max(
+          delay,
+          Math.ceil((count - bucket.content) / (bucket.tokensPerInterval / bucket.interval)),
+        );
+      }
     }
+    return delay;
+  }
 
-    // Make sure the bucket can hold the requested number of tokens
-    if (count > this.bucketSize) {
-      throw new Error(`Requested tokens ${count} exceeds bucket size ${this.bucketSize}`);
+  private remainingTokens(): number {
+    if (!this.parentBucket) return this.bucketSize === 0 ? Number.POSITIVE_INFINITY : this.content;
+    let remaining = Number.POSITIVE_INFINITY;
+    for (const bucket of hierarchy(this)) {
+      remaining = Math.min(remaining, bucket.content);
     }
-
-    // Drip new tokens into this bucket
-    this.drip();
-
-    const comeBackLater = async () => {
-      // How long do we need to wait to make up the difference in tokens?
-      const waitMs = Math.ceil((count - this.content) * (this.interval / this.tokensPerInterval));
-      await wait(waitMs);
-      return this.removeTokens(count);
-    };
-
-    // If we don't have enough tokens in this bucket, come back later
-    if (count > this.content) return comeBackLater();
-
-    if (this.parentBucket != undefined) {
-      // Remove the requested from the parent bucket first
-      const remainingTokens = await this.parentBucket.removeTokens(count);
-
-      // Check that we still have enough tokens in this bucket
-      if (count > this.content) return comeBackLater();
-
-      // Tokens were removed from the parent bucket, now remove them from
-      // this bucket. Note that we look at the current bucket and parent
-      // bucket's remaining tokens and return the smaller of the two values
-      this.content -= count;
-
-      return Math.min(remainingTokens, this.content);
-    } else {
-      // Remove the requested tokens from this bucket
-      this.content -= count;
-      return this.content;
-    }
+    return remaining;
   }
 
   /**
@@ -124,23 +126,24 @@ export class TokenBucket {
    *  false.
    */
   tryRemoveTokens(count: number): boolean {
-    // Is this an infinite size bucket?
-    if (!this.bucketSize) return true;
-
-    // Make sure the bucket can hold the requested number of tokens
-    if (count > this.bucketSize) return false;
-
-    // Drip new tokens into this bucket
-    this.drip();
-
-    // If we don't have enough tokens in this bucket, return false
-    if (count > this.content) return false;
-
-    // Try to remove the requested tokens from the parent bucket
-    if (this.parentBucket && !this.parentBucket.tryRemoveTokens(count)) return false;
-
-    // Remove the requested tokens from this bucket and return
-    this.content -= count;
+    validateTokens(count, "count");
+    // Check the whole hierarchy before charging any bucket. No await may occur
+    // between this check and the debit: competing callers must see the debit.
+    if (this.bucketSize === 0) return true;
+    if (!this.parentBucket) {
+      if (count > this.bucketSize) return false;
+      this.drip();
+      if (count > this.content) return false;
+      this.content -= count;
+      return true;
+    }
+    const buckets = hierarchy(this);
+    for (const bucket of buckets) {
+      if (count > bucket.bucketSize) return false;
+      bucket.drip();
+      if (count > bucket.content) return false;
+    }
+    for (const bucket of buckets) bucket.content -= count;
     return true;
   }
 
@@ -159,9 +162,37 @@ export class TokenBucket {
     const deltaMS = Math.max(now - this.lastDrip, 0);
     this.lastDrip = now;
 
-    const dripAmount = deltaMS * (this.tokensPerInterval / this.interval);
+    // An extremely short interval can overflow the rate even though both
+    // inputs are finite. In particular, 0 * Infinity would poison the bucket.
+    const rate = this.tokensPerInterval / this.interval;
+    const dripAmount = Number.isFinite(rate)
+      ? deltaMS * rate
+      : (deltaMS * this.tokensPerInterval) / this.interval;
     const prevContent = this.content;
     this.content = Math.min(this.content + dripAmount, this.bucketSize);
     return Math.floor(this.content) > Math.floor(prevContent);
   }
+}
+
+export function validateTokens(value: number, name: string): void {
+  if (!Number.isFinite(value) || value < 0 || value > Number.MAX_SAFE_INTEGER) {
+    throw new RangeError(
+      `${name} must be a finite non-negative number no greater than Number.MAX_SAFE_INTEGER`,
+    );
+  }
+}
+
+function hierarchy(start: TokenBucket): TokenBucket[] {
+  const buckets: TokenBucket[] = [];
+  const visited = new Set<TokenBucket>();
+  for (
+    let bucket: TokenBucket | undefined = start;
+    bucket && bucket.bucketSize !== 0;
+    bucket = bucket.parentBucket
+  ) {
+    if (visited.has(bucket)) throw new Error("Circular parentBucket hierarchy");
+    visited.add(bucket);
+    buckets.push(bucket);
+  }
+  return buckets;
 }
