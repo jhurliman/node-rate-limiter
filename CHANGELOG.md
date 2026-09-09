@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## [4.0.0] - 2026-09-08
+
+This is a major release because input validation and asynchronous request ordering
+change observable behavior. See [Upgrading from 3.x](README.md#upgrading-from-3x)
+before upgrading.
 
 ### Fixed
 - Reserve interval allowance before asynchronous calls yield; recheck it after waiting.
@@ -13,6 +17,11 @@
 - Invalid numeric inputs now throw `RangeError` (or reject the returned promise).
 - Async requests on one instance now run FIFO; synchronous requests can still consume capacity first.
 - Fractional millisecond clock precision is retained, so remaining balances may differ slightly from earlier versions.
+
+### Maintenance
+- Refresh development dependencies within their existing declared ranges; no runtime dependencies are added.
+- Build both module distributions in CI and include this changelog in the npm package.
+- Exclude test files and TypeScript build caches from the published package.
 
 ## [3.0.0] - 2025-01-24
 ### Added
