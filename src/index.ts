@@ -1,2 +1,2 @@
-export * from "./RateLimiter.js";
-export * from "./TokenBucket.js";
+export { RateLimiter, type RateLimiterOpts } from "./RateLimiter.js";
+export { TokenBucket, type TokenBucketOpts, type Interval } from "./TokenBucket.js";

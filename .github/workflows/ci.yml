@@ -43,3 +43,6 @@ jobs:
 
       - name: Run tests
         run: yarn test
+
+      - name: Build distribution
+        run: yarn prepack
