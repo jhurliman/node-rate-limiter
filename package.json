@@ -1,18 +1,24 @@
 {
   "name": "limiter",
   "description": "A generic rate limiter for the web and node.js. Useful for API clients, web crawling, or other tasks that need to be throttled",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "author": "John Hurliman <jhurliman@jhurliman.org>",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "browser": "./dist/esm/index.js",
   "exports": {
-    "import": "./dist/esm/index.js",
-    "require": "./dist/cjs/index.js"
+    "import": {
+      "types": "./dist/esm/index.d.ts",
+      "default": "./dist/esm/index.js"
+    },
+    "require": {
+      "types": "./dist/cjs/index.d.ts",
+      "default": "./dist/cjs/index.js"
+    }
   },
-  "repository": "git://github.com/jhurliman/node-rate-limiter",
+  "repository": "https://github.com/jhurliman/node-rate-limiter.git",
   "bugs": {
-    "url": "http://github.com/jhurliman/node-rate-limiter/issues"
+    "url": "https://github.com/jhurliman/node-rate-limiter/issues"
   },
   "license": "MIT",
   "files": [
@@ -30,7 +36,7 @@
   "scripts": {
     "lint": "eslint --fix src",
     "lint:ci": "eslint src",
-    "prepack": "yarn tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node ./create-package-json.js",
+    "prepack": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node ./create-package-json.js",
     "test": "jest src"
   },
   "devDependencies": {
@@ -54,5 +60,6 @@
     "limiting",
     "throttling"
   ],
-  "packageManager": "yarn@1.22.19+sha512.ff4579ab459bb25aa7c0ff75b62acebe576f6084b36aa842971cf250a5d8c6cd3bc9420b22ce63c7f93a0857bc6ef29291db39c3e7a23aab5adfd5a4dd6c5d71"
+  "packageManager": "yarn@1.22.19+sha512.ff4579ab459bb25aa7c0ff75b62acebe576f6084b36aa842971cf250a5d8c6cd3bc9420b22ce63c7f93a0857bc6ef29291db39c3e7a23aab5adfd5a4dd6c5d71",
+  "types": "./dist/cjs/index.d.ts"
 }

@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0] - Unreleased
+
+- Add `RateLimiter.getWaitTime(count)` to estimate cooldowns across both the bucket and interval allowance (#88).
+- Add regressions for positive bucket balances during interval exhaustion and the 5,000-request backlog report.
+- Replace placeholder README snippets with complete examples and clarify sequential limiter composition.
+- Allow npm to build distribution archives without requiring Yarn globally.
+
 ## [4.0.0] - 2026-09-08
 
 This is a major release because input validation and asynchronous request ordering

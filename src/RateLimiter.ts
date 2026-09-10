@@ -63,11 +63,7 @@ export class RateLimiter {
     return this.requests.run(async () => {
       while (true) {
         if (this.tryRemoveTokens(count)) return this.tokenBucket.content;
-        const intervalDelay =
-          count > this.tokenBucket.tokensPerInterval - this.tokensThisInterval
-            ? this.curIntervalStart + this.tokenBucket.interval - getMilliseconds()
-            : 0;
-        await wait(Math.max(1, Math.ceil(intervalDelay), this.tokenBucket.getWaitTime(count)));
+        await wait(this.getWaitTime(count));
       }
     });
   }
@@ -104,6 +100,30 @@ export class RateLimiter {
       this.tokensThisInterval += count;
     }
     return removed;
+  }
+
+  /**
+   * Estimate milliseconds until count tokens can be removed, accounting for
+   * both bucket refill and the interval allowance. Does not reserve tokens or
+   * account for queued requests; competing removals can change the estimate.
+   * Throws RangeError for invalid counts or requests exceeding capacity.
+   */
+  getWaitTime(count: number): number {
+    validateTokens(count, "count");
+    if (count > this.tokenBucket.bucketSize) {
+      throw new RangeError(
+        `Requested tokens ${count} exceeds maximum tokens per interval ${this.tokenBucket.bucketSize}`,
+      );
+    }
+    const bucketDelay = this.tokenBucket.getWaitTime(count);
+    const now = getMilliseconds();
+    const intervalActive =
+      now >= this.curIntervalStart && now - this.curIntervalStart < this.tokenBucket.interval;
+    const intervalDelay =
+      intervalActive && count > this.tokenBucket.tokensPerInterval - this.tokensThisInterval
+        ? this.curIntervalStart + this.tokenBucket.interval - now
+        : 0;
+    return Math.max(0, Math.ceil(intervalDelay), bucketDelay);
   }
 
   /**
