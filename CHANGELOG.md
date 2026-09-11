@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.1.0] - Unreleased
+## [4.1.0] — 2026-09-10
 
 - Add `RateLimiter.getWaitTime(count)` to estimate cooldowns across both the bucket and interval allowance (#88).
 - Add regressions for positive bucket balances during interval exhaustion and the 5,000-request backlog report.
